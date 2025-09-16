@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, Response
 import os
 import syncedlyrics
+from urllib.parse import quote
 
 app = Flask(__name__)
 
@@ -43,7 +44,7 @@ def get_lyrics():
     return jsonify({"track": track, "lyrics": lrc})
 
 
-# --- Endpoint to download .lrc file ---
+# --- Endpoint to download .lrc file with Unicode-safe filename ---
 @app.route("/download")
 def download_lyrics():
     artist = request.args.get("artist", "").strip()
@@ -57,10 +58,12 @@ def download_lyrics():
         return jsonify({"error": "Lyrics not found"}), 404
 
     filename, lrc = result
+    encoded_filename = quote(os.path.basename(filename))  # URL-encode Unicode
+
     return Response(
         lrc,
         mimetype="text/plain",
-        headers={"Content-Disposition": f"attachment;filename={os.path.basename(filename)}"}
+        headers={"Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"}
     )
 
 
