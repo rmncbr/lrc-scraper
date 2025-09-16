@@ -2,8 +2,10 @@ from flask import Flask, request, jsonify, Response
 import os
 import syncedlyrics
 from urllib.parse import quote
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)  # allows requests from all origins; optional: restrict to your frontend domain
 
 # --- Reusable lyrics function ---
 def fetch_and_save_lyrics(track_name: str, artist_name: str, save_folder: str = "."):
